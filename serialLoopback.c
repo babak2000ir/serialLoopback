@@ -21,24 +21,6 @@ void LCD_write(unsigned char data);
 
 unsigned int color = 0b00000000;
 
-/* int main(void) {
-  
-
-  // -------- Inits --------- //
-  LED_DDR = 0xff;                            
-  initUSART();
-  printString("Hello World!\r\n");                         
-
-  // ------ Event loop ------ //
-  while (1) {
-
-    
-                           
-
-  }                                                 
-  return 0;
-} */
-
 main()
 {
   DDRB=0xFF;              // set LCD data port as output
