@@ -23,6 +23,7 @@ void init_LCD(void);
 void LCD_write(unsigned char data);
 void playNote(uint16_t period, uint16_t duration);
 void rest(uint16_t duration);
+void LCD_toggle_color();
 
 unsigned int color = 0b00000000;
 
@@ -30,69 +31,28 @@ main()
 {
   DDRB=0xFF;              // set LCD data port as output
   DDRC=0xFF;              // RGB
-  DDRD=0xFF;              // set LCD control port as output
+  DDRD=0b11111011;              // set LCD control port as output
 
-  initUSART();
-  printString("----- Serial Organ ------\r\n");
-
-  char fromCompy;                        /* used to store serial input */
-  uint16_t currentNoteLength = NOTE_DURATION / 2;
-  const uint8_t keys[] = { 'a', 'w', 's', 'e', 'd', 'f', 't',
-    'g', 'y', 'h', 'j', 'i', 'k', 'o',
-    'l', 'p', ';', '\''
-  };
-  const uint16_t notes[] = { G4, Gx4, A4, Ax4, B4, C5, Cx5,
-    D5, Dx5, E5, F5, Fx5, G5, Gx5,
-    A5, Ax5, B5, C6
-  };
-  uint8_t isNote;
-  uint8_t i;
+  PORTD |= (1 << PD2);
 
   //char serialCharacter;
   init_LCD();             // initialize LCD
   _delay_ms(20);   
-  initUSART();
 
   LCD_cmd(0x0C);          // display on, cursor off 
-  LCD_writestr("PLAY: ");
+  LCD_writestr(">  ");
   LCD_cmd(0xC0);          // move cursor to the start of 2nd line
   LCD_cmd(0x0C);          // display on, cursor off
-  
-  printString("listening...\r\n");  
 
-while (1) {
+  while (1) {
+      
+    if (bit_is_clear(PIND, PD2)) {
+      LCD_write('P ');  
+      LCD_toggle_color();
+    }  
 
-                                                            /* Get Key */
-    fromCompy = receiveByte();      /* waits here until there is input */
-    transmitByte('N');     /* alert computer we're ready for next note */
-    LCD_write(fromCompy);  
-
-                                                         /* Play Notes */
-    isNote = 0;
-    for (i = 0; i < sizeof(keys); i++) {
-      if (fromCompy == keys[i]) {       /* found match in lookup table */
-        playNote(notes[i], currentNoteLength);
-        isNote = 1;                  /* record that we've found a note */
-        break;                               /* drop out of for() loop */
-      }
-    }
-
-                      /* Handle non-note keys: tempo changes and rests */
-    if (!isNote) {
-      if (fromCompy == '[') {                   /* code for short note */
-        currentNoteLength = NOTE_DURATION / 2;
-      }
-      else if (fromCompy == ']') {               /* code for long note */
-        currentNoteLength = NOTE_DURATION;
-      }
-      else {                                /* unrecognized, just rest */
-        rest(currentNoteLength);
-      }
-    }
-
-  }       
-
-  LCD_cmd(0x0E);          // make display ON, cursor ON
+    LCD_cmd(0x0E);          // make display ON, cursor ON
+  }
 }
 
 void init_LCD(void)
