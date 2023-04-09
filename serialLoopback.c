@@ -35,6 +35,8 @@ main()
 
   PORTD |= (1 << PD2);
 
+  uint8_t buttonWasPressed;
+
   //char serialCharacter;
   init_LCD();             // initialize LCD
   _delay_ms(20);   
@@ -47,9 +49,18 @@ main()
   while (1) {
       
     if (bit_is_clear(PIND, PD2)) {
-      LCD_write('P ');  
-      LCD_toggle_color();
+      if (!buttonWasPressed) {
+        buttonWasPressed = 1;
+        LCD_writestr("P "); 
+        LCD_toggle_color();
+      }
     }  
+    else {
+      if (buttonWasPressed) {
+        LCD_writestr("R ");
+      }
+      buttonWasPressed = 0;
+    }
 
     LCD_cmd(0x0E);          // make display ON, cursor ON
   }
@@ -112,7 +123,7 @@ void LCD_writestr(char *str)
   while(str[i]!=0)
   {
     LCD_write(str[i]);
-    _delay_ms(30);
+    //_delay_ms(30);
     //LCD_toggle_color();
     i++;
   }
