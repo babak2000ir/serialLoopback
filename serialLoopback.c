@@ -17,6 +17,7 @@ Takes in a character at a time and sends it right back out,
 #define en PC5                 // enable signal is connected to port D pin 7
 #define rs PC4                  // register select signal is connected to port D pin 5
 #define NOTE_DURATION     0xF000  
+#define DEBOUNCE_TIME     1000
 
 void LCD_cmd(unsigned char cmd);
 void init_LCD(void);
@@ -24,6 +25,7 @@ void LCD_write(unsigned char data);
 void playNote(uint16_t period, uint16_t duration);
 void rest(uint16_t duration);
 void LCD_toggle_color();
+uint8_t debounce(void);
 
 unsigned int color = 0b00000000;
 
@@ -48,7 +50,7 @@ main()
 
   while (1) {
       
-    if (bit_is_clear(PIND, PD2)) {
+    if (debounce()) {
       if (!buttonWasPressed) {
         buttonWasPressed = 1;
         LCD_writestr("P "); 
@@ -64,6 +66,16 @@ main()
 
     LCD_cmd(0x0E);          // make display ON, cursor ON
   }
+}
+
+uint8_t debounce(void) {
+    if (bit_is_clear(PIND, PD2)) {
+        _delay_us(DEBOUNCE_TIME);
+        if (bit_is_clear(PIND, PD2)) {
+            return (1);
+        }
+    }
+  return (0);
 }
 
 void init_LCD(void)
