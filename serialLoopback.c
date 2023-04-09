@@ -22,7 +22,7 @@ void LCD_write(unsigned char data);
 unsigned int color = 0b00000000;
 
 /* int main(void) {
-  char serialCharacter;
+  
 
   // -------- Inits --------- //
   LED_DDR = 0xff;                            
@@ -32,9 +32,7 @@ unsigned int color = 0b00000000;
   // ------ Event loop ------ //
   while (1) {
 
-    serialCharacter = receiveByte();
-    transmitByte(serialCharacter);
-    LED_PORT = serialCharacter;
+    
                            
 
   }                                                 
@@ -45,24 +43,30 @@ main()
 {
   DDRB=0xFF;              // set LCD data port as output
   DDRC=0xFF;              // RGB
-  DDRD=0xFF;              // set LCD signals (RS, RW, E) as out put
+  DDRD=0xFF;              // set LCD control port as output
 
+  char serialCharacter;
   init_LCD();             // initialize LCD
-  _delay_ms(20);         
+  _delay_ms(20);   
+  initUSART();
 
   LCD_cmd(0x0C);          // display on, cursor off 
+  LCD_writestr("incoming: ");
+  LCD_cmd(0xC0);          // move cursor to the start of 2nd line
+  LCD_cmd(0x0C);          // display on, cursor off
+  
+  printString("listening...\r\n");  
 
   while (1) {
-    LCD_writestr("-> Juju  Bubu <-");        // call a function to display “Atmega32” on LCD
+    
 
-    LCD_cmd(0xC0);          // move cursor to the start of 2nd line
+    serialCharacter = receiveByte();
+    transmitByte(serialCharacter);
+    LCD_write(serialCharacter);
 
-    LCD_cmd(0x0C);          // display on, cursor off
-
-    LCD_writestr("----Colorful----"); // call a function to display “Microcontroller” on LCD
-
+    //LCD_writestr("----Colorful----"); // call a function to display “Microcontroller” on LCD
     //clear the screen
-    LCD_cmd(0x01);          // make clear LCD
+    //LCD_cmd(0x01);          // make clear LCD
   }
 
   LCD_cmd(0x0E);          // make display ON, cursor ON
@@ -126,7 +130,7 @@ void LCD_writestr(char *str)
   {
     LCD_write(str[i]);
     _delay_ms(30);
-    LCD_toggle_color();
+    //LCD_toggle_color();
     i++;
   }
 }

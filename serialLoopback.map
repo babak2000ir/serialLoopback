@@ -17,17 +17,12 @@ Discarded input sections
  .bss           0x00000000        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr5/crtm328p.o
  .text          0x00000000        0x0 serialLoopback.o
  .bss           0x00000000        0x0 serialLoopback.o
+ .text.LCD_toggle_color
+                0x00000000        0x0 serialLoopback.o
+ .bss.color     0x00000000        0x0 serialLoopback.o
  .text          0x00000000        0x0 ../../AVR-Programming-Library/USART.o
  .data          0x00000000        0x0 ../../AVR-Programming-Library/USART.o
  .bss           0x00000000        0x0 ../../AVR-Programming-Library/USART.o
- .text.initUSART
-                0x00000000        0x0 ../../AVR-Programming-Library/USART.o
- .text.transmitByte
-                0x00000000        0x0 ../../AVR-Programming-Library/USART.o
- .text.receiveByte
-                0x00000000        0x0 ../../AVR-Programming-Library/USART.o
- .text.printString
-                0x00000000        0x0 ../../AVR-Programming-Library/USART.o
  .text.readString
                 0x00000000        0x0 ../../AVR-Programming-Library/USART.o
  .text.printByte
@@ -174,7 +169,7 @@ LOAD c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr5\libgcc.a
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x1a6
+.text           0x00000000      0x1f2
  *(.vectors)
  .vectors       0x00000000       0x68 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr5/crtm328p.o
                 0x00000000                __vectors
@@ -266,19 +261,28 @@ LOAD c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr5\libgcc.a
  .text.LCD_write
                 0x00000102       0x12 serialLoopback.o
                 0x00000102                LCD_write
- .text.LCD_toggle_color
-                0x00000114       0x26 serialLoopback.o
-                0x00000114                LCD_toggle_color
  .text.LCD_writestr
-                0x0000013a       0x2e serialLoopback.o
-                0x0000013a                LCD_writestr
- .text.main     0x00000168       0x3a serialLoopback.o
-                0x00000168                main
-                0x000001a2                . = ALIGN (0x2)
+                0x00000114       0x2a serialLoopback.o
+                0x00000114                LCD_writestr
+ .text.main     0x0000013e       0x4e serialLoopback.o
+                0x0000013e                main
+ .text.initUSART
+                0x0000018c       0x22 ../../AVR-Programming-Library/USART.o
+                0x0000018c                initUSART
+ .text.transmitByte
+                0x000001ae       0x10 ../../AVR-Programming-Library/USART.o
+                0x000001ae                transmitByte
+ .text.receiveByte
+                0x000001be        0xe ../../AVR-Programming-Library/USART.o
+                0x000001be                receiveByte
+ .text.printString
+                0x000001cc       0x22 ../../AVR-Programming-Library/USART.o
+                0x000001cc                printString
+                0x000001ee                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x000001a2        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr5\libgcc.a(_exit.o)
-                0x000001a2                exit
-                0x000001a2                _exit
+ .fini9         0x000001ee        0x0 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr5\libgcc.a(_exit.o)
+                0x000001ee                exit
+                0x000001ee                _exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -297,39 +301,37 @@ LOAD c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr5\libgcc.a
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x000001a2        0x4 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr5\libgcc.a(_exit.o)
+ .fini0         0x000001ee        0x4 c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr5\libgcc.a(_exit.o)
  *(.fini0)
-                0x000001a6                _etext = .
+                0x000001f2                _etext = .
 
-.data           0x00800100       0x22 load address 0x000001a6
+.data           0x00800100       0x1a load address 0x000001f2
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
- .data          0x00800100       0x22 serialLoopback.o
+ .data          0x00800100       0x1a serialLoopback.o
  *(.data*)
  *(.rodata)
  *(.rodata*)
  *(.gnu.linkonce.d*)
-                0x00800122                . = ALIGN (0x2)
-                0x00800122                _edata = .
-                0x00800122                PROVIDE (__data_end, .)
+                0x0080011a                . = ALIGN (0x2)
+                0x0080011a                _edata = .
+                0x0080011a                PROVIDE (__data_end, .)
 
-.bss            0x00800122        0x2
-                0x00800122                PROVIDE (__bss_start, .)
+.bss            0x0080011a        0x0
+                0x0080011a                PROVIDE (__bss_start, .)
  *(.bss)
  *(.bss*)
- .bss.color     0x00800122        0x2 serialLoopback.o
-                0x00800122                color
  *(COMMON)
-                0x00800124                PROVIDE (__bss_end, .)
-                0x000001a6                __data_load_start = LOADADDR (.data)
-                0x000001c8                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x0080011a                PROVIDE (__bss_end, .)
+                0x000001f2                __data_load_start = LOADADDR (.data)
+                0x0000020c                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x00800124        0x0
-                0x00800124                PROVIDE (__noinit_start, .)
+.noinit         0x0080011a        0x0
+                0x0080011a                PROVIDE (__noinit_start, .)
  *(.noinit*)
-                0x00800124                PROVIDE (__noinit_end, .)
-                0x00800124                _end = .
-                0x00800124                PROVIDE (__heap_start, .)
+                0x0080011a                PROVIDE (__noinit_end, .)
+                0x0080011a                _end = .
+                0x0080011a                PROVIDE (__heap_start, .)
 
 .eeprom         0x00810000        0x0
  *(.eeprom*)
@@ -395,32 +397,32 @@ LOAD c:/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr5\libgcc.a
  .debug_pubnames
                 0x00000072       0xc8 ../../AVR-Programming-Library/USART.o
 
-.debug_info     0x00000000      0x7c6
+.debug_info     0x00000000      0x7d3
  *(.debug_info)
- .debug_info    0x00000000      0x37e serialLoopback.o
- .debug_info    0x0000037e      0x448 ../../AVR-Programming-Library/USART.o
+ .debug_info    0x00000000      0x38b serialLoopback.o
+ .debug_info    0x0000038b      0x448 ../../AVR-Programming-Library/USART.o
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev   0x00000000      0x2e1
+.debug_abbrev   0x00000000      0x2f0
  *(.debug_abbrev)
- .debug_abbrev  0x00000000      0x13e serialLoopback.o
- .debug_abbrev  0x0000013e      0x1a3 ../../AVR-Programming-Library/USART.o
+ .debug_abbrev  0x00000000      0x14d serialLoopback.o
+ .debug_abbrev  0x0000014d      0x1a3 ../../AVR-Programming-Library/USART.o
 
-.debug_line     0x00000000      0x756
+.debug_line     0x00000000      0x768
  *(.debug_line)
- .debug_line    0x00000000      0x2f7 serialLoopback.o
- .debug_line    0x000002f7      0x45f ../../AVR-Programming-Library/USART.o
+ .debug_line    0x00000000      0x309 serialLoopback.o
+ .debug_line    0x00000309      0x45f ../../AVR-Programming-Library/USART.o
 
 .debug_frame    0x00000000      0x130
  *(.debug_frame)
  .debug_frame   0x00000000       0x70 serialLoopback.o
  .debug_frame   0x00000070       0xc0 ../../AVR-Programming-Library/USART.o
 
-.debug_str      0x00000000      0x25a
+.debug_str      0x00000000      0x26a
  *(.debug_str)
- .debug_str     0x00000000      0x117 serialLoopback.o
-                                0x156 (size before relaxing)
- .debug_str     0x00000117      0x143 ../../AVR-Programming-Library/USART.o
+ .debug_str     0x00000000      0x127 serialLoopback.o
+                                0x166 (size before relaxing)
+ .debug_str     0x00000127      0x143 ../../AVR-Programming-Library/USART.o
                                 0x1c9 (size before relaxing)
 
 .debug_loc      0x00000000      0x2a3
