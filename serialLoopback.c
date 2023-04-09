@@ -18,6 +18,7 @@ Takes in a character at a time and sends it right back out,
 #define rs PC4                  // register select signal is connected to port D pin 5
 #define NOTE_DURATION     0xF000  
 #define DEBOUNCE_TIME     1000
+#define SONG_LENGTH  (sizeof(song) / sizeof(uint16_t))
 
 void LCD_cmd(unsigned char cmd);
 void init_LCD(void);
@@ -37,7 +38,18 @@ main()
 
   PORTD |= (1 << PD2);
 
-  uint8_t buttonWasPressed;
+  const uint16_t song[] = {
+    E6, E6, E6, C6, E6, G6, G5,
+    C6, G5, E5, A5, B5, Ax5, A5,
+    G5, E6, G6, A6, F6, G6, E6, C6, D6, B5,
+    C6, G5, E5, A5, B5, Ax5, A5,
+    G5, E6, G6, A6, F6, G6, E6, C6, D6, B5,
+                                                                /* etc */
+  };
+  /* starting at end b/c routine starts by incrementing and then playing
+     this makes the song start at the beginning after reboot */
+  uint8_t whichNote = SONG_LENGTH - 1;
+  uint8_t wasButtonPressed = 0;
 
   //char serialCharacter;
   init_LCD();             // initialize LCD
@@ -50,18 +62,19 @@ main()
 
   while (1) {
       
-    if (debounce()) {
-      if (!buttonWasPressed) {
-        buttonWasPressed = 1;
-        LCD_writestr("P "); 
-        LCD_toggle_color();
+    if (bit_is_clear(BUTTON_PIN, BUTTON)) {
+      if (!wasButtonPressed) {              /* if it's a new press ... */
+        whichNote++;                           /* advance to next note */
+                                         /* but don't run over the end */
+        if (whichNote == SONG_LENGTH) {
+          whichNote = 0;
+        }
+        wasButtonPressed = 1;
       }
-    }  
+      playNote(song[whichNote], 1600);
+    }
     else {
-      if (buttonWasPressed) {
-        LCD_writestr("R ");
-      }
-      buttonWasPressed = 0;
+      wasButtonPressed = 0;
     }
 
     LCD_cmd(0x0E);          // make display ON, cursor ON
