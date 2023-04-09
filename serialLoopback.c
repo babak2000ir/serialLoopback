@@ -3,21 +3,26 @@ A simple test of serial-port functionality.
 Takes in a character at a time and sends it right back out,
  displaying the ASCII value on the LEDs.
 */
+#define __AVR_ATmega328P__
 
 // ------- Preamble -------- //
 #include <avr/io.h>
 #include <util/delay.h>
 #include "pinDefines.h"
 #include "USART.h"
+#include "scale16.h"
 
 #define LCD_DATA PORTB          // port B is selected as LCD data port
 #define color_port PORTC
 #define en PC5                 // enable signal is connected to port D pin 7
 #define rs PC4                  // register select signal is connected to port D pin 5
+#define NOTE_DURATION     0xF000  
 
 void LCD_cmd(unsigned char cmd);
 void init_LCD(void);
 void LCD_write(unsigned char data);
+void playNote(uint16_t period, uint16_t duration);
+void rest(uint16_t duration);
 
 unsigned int color = 0b00000000;
 
@@ -27,29 +32,65 @@ main()
   DDRC=0xFF;              // RGB
   DDRD=0xFF;              // set LCD control port as output
 
-  char serialCharacter;
+  initUSART();
+  printString("----- Serial Organ ------\r\n");
+
+  char fromCompy;                        /* used to store serial input */
+  uint16_t currentNoteLength = NOTE_DURATION / 2;
+  const uint8_t keys[] = { 'a', 'w', 's', 'e', 'd', 'f', 't',
+    'g', 'y', 'h', 'j', 'i', 'k', 'o',
+    'l', 'p', ';', '\''
+  };
+  const uint16_t notes[] = { G4, Gx4, A4, Ax4, B4, C5, Cx5,
+    D5, Dx5, E5, F5, Fx5, G5, Gx5,
+    A5, Ax5, B5, C6
+  };
+  uint8_t isNote;
+  uint8_t i;
+
+  //char serialCharacter;
   init_LCD();             // initialize LCD
   _delay_ms(20);   
   initUSART();
 
   LCD_cmd(0x0C);          // display on, cursor off 
-  LCD_writestr("incoming: ");
+  LCD_writestr("PLAY: ");
   LCD_cmd(0xC0);          // move cursor to the start of 2nd line
   LCD_cmd(0x0C);          // display on, cursor off
   
   printString("listening...\r\n");  
 
-  while (1) {
-    
+while (1) {
 
-    serialCharacter = receiveByte();
-    transmitByte(serialCharacter);
-    LCD_write(serialCharacter);
+                                                            /* Get Key */
+    fromCompy = receiveByte();      /* waits here until there is input */
+    transmitByte('N');     /* alert computer we're ready for next note */
+    LCD_write(fromCompy);  
 
-    //LCD_writestr("----Colorful----"); // call a function to display “Microcontroller” on LCD
-    //clear the screen
-    //LCD_cmd(0x01);          // make clear LCD
-  }
+                                                         /* Play Notes */
+    isNote = 0;
+    for (i = 0; i < sizeof(keys); i++) {
+      if (fromCompy == keys[i]) {       /* found match in lookup table */
+        playNote(notes[i], currentNoteLength);
+        isNote = 1;                  /* record that we've found a note */
+        break;                               /* drop out of for() loop */
+      }
+    }
+
+                      /* Handle non-note keys: tempo changes and rests */
+    if (!isNote) {
+      if (fromCompy == '[') {                   /* code for short note */
+        currentNoteLength = NOTE_DURATION / 2;
+      }
+      else if (fromCompy == ']') {               /* code for long note */
+        currentNoteLength = NOTE_DURATION;
+      }
+      else {                                /* unrecognized, just rest */
+        rest(currentNoteLength);
+      }
+    }
+
+  }       
 
   LCD_cmd(0x0E);          // make display ON, cursor ON
 }
@@ -150,4 +191,22 @@ void LCD_toggle_color()
 
   //set color to white
   //color_port = 0b00000000; 
+}
+
+void playNote(uint16_t period, uint16_t duration) {
+  uint16_t elapsed;
+  uint16_t i;
+  for (elapsed = 0; elapsed < duration; elapsed += period) {
+                     /* For loop with variable delay selects the pitch */
+    for (i = 0; i < period; i++) {
+      _delay_us(1);
+    }
+    SPEAKER_PORT ^= (1 << SPEAKER);
+  }
+}
+
+void rest(uint16_t duration) {
+  do {
+    _delay_us(1);
+  } while (--duration);
 }

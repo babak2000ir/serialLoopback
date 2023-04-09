@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "avr",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/WinAVR-20100110/**",
+                "../../AVR-Programming-Library/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.22621.0",
+            "compilerPath": "C:/WinAVR-20100110/bin/avr32-gcc.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-arm"
+        }
+    ],
+    "version": 4
+}
