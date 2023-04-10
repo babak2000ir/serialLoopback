@@ -62,20 +62,21 @@ main()
 
   while (1) {
       
-    if (bit_is_clear(BUTTON_PIN, BUTTON)) {
-      if (!wasButtonPressed) {              /* if it's a new press ... */
+    //if (bit_is_clear(BUTTON_PIN, BUTTON)) {
+      //if (!wasButtonPressed) {              /* if it's a new press ... */
         whichNote++;                           /* advance to next note */
                                          /* but don't run over the end */
         if (whichNote == SONG_LENGTH) {
           whichNote = 0;
         }
-        wasButtonPressed = 1;
-      }
+        //wasButtonPressed = 1;
+      //}
       playNote(song[whichNote], 1600);
-    }
-    else {
-      wasButtonPressed = 0;
-    }
+      _delay_ms(2);
+    //}
+    //else {
+    //  wasButtonPressed = 0;
+    //}
 
     LCD_cmd(0x0E);          // make display ON, cursor ON
   }
